@@ -14,7 +14,6 @@ app.use(express.json());
 connectDB();
 router(app);
 
-//app.use('api/accounts', router);
 
 
 app.listen(5000, () => {
