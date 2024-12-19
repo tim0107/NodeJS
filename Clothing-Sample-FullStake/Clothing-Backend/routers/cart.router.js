@@ -3,17 +3,21 @@ const router = express.Router();
 
 const {addToCart,getCart,deleteCart,updateCart} = require('../controllers/cart.controller');
 
+const asyncMiddleware = require('../middleware/async.middleware')
+
 router.route('/')
-.post(addToCart)
+.post(asyncMiddleware(addToCart))
 
 
 
 router.route('/account/:account_id')
-.get(getCart);
+.get(asyncMiddleware(getCart));
 
 router.route('/account/:account_id/:product_id')
-.delete(deleteCart)
-.patch(updateCart)
+.delete(asyncMiddleware(deleteCart))
+.patch(asyncMiddleware(updateCart))
+
+
 
 
 

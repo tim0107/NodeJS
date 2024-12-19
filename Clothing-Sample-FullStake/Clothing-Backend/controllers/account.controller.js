@@ -1,36 +1,54 @@
-const accountModel = require('../models/account.model');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+const accountModel = require("../models/account.model");
+const { param } = require('../routers/order.router');
+
+require('dotenv').config();
+
+const SECRET_KEY = process.env.SECRET_KEY; 
+
 
 module.exports = {
-  register: async (req, res) => {
-    try {
-      const body = req.body;
-      const registerAcc = await accountModel.create(body);
-      return res.status(201).json(registerAcc);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
+
+  createAccount: async (req,res) => {
+    const body = req.body;
+    const createAcc = await accountModel.create(body);
+    return res.status(201).json(createAcc);
+  },
+
+  updateAccount: async(req,res) => {
+    
+    const body = req.body;
+
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    } const decoded = jwt.verify(token, SECRET_KEY);
+    const userId = decoded.id;
+
+    console.log(body)
+    console.log(decoded)
+    console.log(userId)
+    
+
+    const update = await accountModel.findByIdAndUpdate(userId,body,{new:true});
+
+    if(update) {
+      return res.status(200).json({message: "updated"})
+    } else {
+      return res.status(400).json({message: "not found"})
     }
   },
-  login: async (req, res) => {
-    try {
-      const body = req.body;
-      const account = await accountModel.findOne(body);
-      if (!account) {
-        return res.status(400).json({
-          statusCode: 400,
-          message: 'Tài khoản hoặc mật khẩu không đúng',
-        });
-      }
-      return res.status(200).json(account);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
-  },
-  getAccounts: async (req, res) => {
-    try {
-        let account = await accountModel.find()
-        return res.status(200).json(account);
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-    }
+
+  deleteAccount: async(req,res) => {
+    const id = req.params.id;
+
+    const deleted = await accountModel.findByIdAndDelete(id);
+
+    if(!deleted) {
+      return res.status(400).json({message: 'account not found'});
+  }
+
+    return res.status(200).json({message: "deleted"});
   },
 };

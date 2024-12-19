@@ -9,14 +9,17 @@ const {
   getProducts,
 } = require('../controllers/product.controller');
 
+const asyncMiddleware = require('../middleware/async.middleware')
+
+
 
 router.route('/')
-.get(getProducts)
-.post(createProduct)
+.get(asyncMiddleware(getProducts))
+.post(asyncMiddleware(createProduct))
 
 router.route('/:id')
-.get(getProductById)
-.patch(updateProduct)
-.delete(deleteProducts)
+.get(asyncMiddleware(getProductById))
+.patch(asyncMiddleware(updateProduct))
+.delete(asyncMiddleware(deleteProducts))
 
 module.exports = router;

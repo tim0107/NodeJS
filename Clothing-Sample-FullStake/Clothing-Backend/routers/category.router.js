@@ -9,16 +9,39 @@ const {
   createCategory,
 } = require('../controllers/category.controller');
 
-console.log('from cate router')
+const asyncMiddleware = require('../middleware/async.middleware');
+const authMiddleware = require('../middleware/auth.middleware');
+const roleMiddleware = require('../middleware/role.middleware');
 
+router
+  .route('/')
+  .get(
+    asyncMiddleware(authMiddleware),
+    asyncMiddleware(roleMiddleware(['admin'])),
+    asyncMiddleware(getCategory),
+  )
+  .post(
+    asyncMiddleware(authMiddleware),
+    asyncMiddleware(roleMiddleware(['admin'])),
+    asyncMiddleware(createCategory),
+  );
 
-router.route('/')
-.get(getCategory)
-.post(createCategory)
+router
+  .route('/:id')
+  .get(
+    asyncMiddleware(authMiddleware),
+    asyncMiddleware(roleMiddleware(['admin'])),
+    asyncMiddleware(getCategoryById),
+  )
+  .patch(
+    asyncMiddleware(authMiddleware),
+    asyncMiddleware(roleMiddleware(['admin'])),
+    asyncMiddleware(updateCategory),
+  )
+  .delete(
+    asyncMiddleware(authMiddleware),
+    asyncMiddleware(roleMiddleware(['admin'])),
+    asyncMiddleware(deleteCategory),
+  );
 
-router.route('/:id')
-.get(getCategoryById)
-.patch(updateCategory)
-.delete(deleteCategory)
-
-module.exports = router; 
+module.exports = router;

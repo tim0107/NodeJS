@@ -4,9 +4,8 @@ const accountRoute = require('./account.router');
 const cartRoute = require('./cart.router');
 const orderRoute = require('./order.router');
 
+const errorHandle = require('../middleware/error.handle')
 
-
-console.log('this is from index,js');
 
 module.exports = (app) => {
     app.use('/clothe/products', productRoute);
@@ -14,6 +13,12 @@ module.exports = (app) => {
     app.use('/clothe/account', accountRoute);
     app.use('/clothe/cart', cartRoute);
     app.use('/clothe/order', orderRoute);
+
+
+    // every coming request will eventually go through here
+    // mean that every error in the route will meet this
+    // global met
+    app.use(errorHandle);
 
 }
 

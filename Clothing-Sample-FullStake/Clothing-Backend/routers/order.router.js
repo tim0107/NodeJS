@@ -3,16 +3,16 @@ const router = express.Router();
 
 const {createOrder,getAllOrder,getOrderByAccount} = require('../controllers/order.controller');
 
-console.log('this is from order');
+const asyncMiddleware = require('../middleware/async.middleware')
 
 
 router.route('/')
-.post(createOrder)
-.get(getAllOrder)
+.post(asyncMiddleware(createOrder))
+.get(asyncMiddleware(getAllOrder))
 
 
 router.route('/:account_id')
-.get(getOrderByAccount)
+.get(asyncMiddleware(getOrderByAccount))
 
 
 
