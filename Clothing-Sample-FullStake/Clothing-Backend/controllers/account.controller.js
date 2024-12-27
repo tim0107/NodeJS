@@ -18,20 +18,34 @@ module.exports = {
 
   updateAccount: async(req,res) => {
     
-    const body = req.body;
+    const updates = Object.keys(req.body); 
+    const id = req.account._id
+    const userRole = req.account.role; 
+    console.log(userRole)
 
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
-    } const decoded = jwt.verify(token, SECRET_KEY);
-    const userId = decoded.id;
+    let allowedUpdates = [];
+    if (userRole === "admin") {
+      allowedUpdates = ["accountName", "password", "address", "phone", "role"];
+    } else if (userRole === "user") {
+      allowedUpdates = ["accountName", "password", "address", "phone"];
+    }
 
-    console.log(body)
-    console.log(decoded)
-    console.log(userId)
-    
+    const isValid = updates.every((key) => allowedUpdates.includes(key));
+    if (!isValid) {
+      return res.status(400).json({ message: "not allow" });
+    }
 
-    const update = await accountModel.findByIdAndUpdate(userId,body,{new:true});
+    const updateFields = {};
+    updates.forEach((key) => {
+      updateFields[key] = req.body[key];
+    });
+
+    const update = await accountModel.findByIdAndUpdate
+    (
+      id,
+      {$set: updateFields},
+      {new:true}
+    );
 
     if(update) {
       return res.status(200).json({message: "updated"})

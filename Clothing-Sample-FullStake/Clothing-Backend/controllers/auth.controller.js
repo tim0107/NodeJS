@@ -8,16 +8,26 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 module.exports = {
   register: async (req, res) => {
-    const body = req.body;
-    const registerAcc = await accountModel.create(body);
+    const { username, password, address, phone } = req.body;
+    // const body = req.body;
+
+    const registerAcc = await accountModel.create({
+      accountName : username,
+      password,
+      address,
+      phone,
+      role: "user"
+    });
+    
+    console.log(registerAcc);
     return res.status(201).json(registerAcc);
   },
   login: async (req, res) => {
-    const { accountName, password } = req.body;
+    const { username, password } = req.body;
 
     console.log('Request Body:', req.body);
 
-    const account = await accountModel.findOne({ accountName });
+    const account = await accountModel.findOne({ accountName : username });
 
     if (!account) {
       return res.status(400).json({

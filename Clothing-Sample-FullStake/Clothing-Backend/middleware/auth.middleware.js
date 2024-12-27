@@ -1,5 +1,3 @@
-
-
 const jwt = require("jsonwebtoken");
 const accountModel = require("../models/account.model");
 require('dotenv').config();
@@ -8,6 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 async function authMiddleware(req, res, next) {
     const authorization = req.headers.authorization;
+    const ErrorResponse = require('../helpers/ErrorResponse');
 
     if(!authorization) {
       return res.status(400).json({message: 'not authorized'})
@@ -22,11 +21,16 @@ async function authMiddleware(req, res, next) {
     
 
     const account = await accountModel.findById(decoded.id);
+    if (!account) {
+      throw new ErrorResponse(403, "Lỗi")
+    }
 
-    console.log(account,'acc');
+    console.log(account,'from middleware');
     
     
     req.account = account;
+
+    
 
     next(); 
   

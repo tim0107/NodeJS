@@ -8,17 +8,20 @@ const errorHandle = require('../middleware/error.handle')
 
 
 module.exports = (app) => {
-    app.use('/clothe/products', productRoute);
-    app.use('/clothe/categorys', categoryRoute);
-    app.use('/clothe/account', accountRoute);
-    app.use('/clothe/cart', cartRoute);
-    app.use('/clothe/order', orderRoute);
+    app.use('/api/products', productRoute);
+    app.use('/api/categorys', categoryRoute);
+    app.use('/api/account', accountRoute);
+    app.use('/api/cart', cartRoute);
+    app.use('/api/order', orderRoute);
 
 
     // every coming request will eventually go through here
     // mean that every error in the route will meet this
     // global met
-    app.use(errorHandle);
+    app.use(errorHandle)
+
+
+
 
 }
 

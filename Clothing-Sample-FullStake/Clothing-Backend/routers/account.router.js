@@ -6,6 +6,8 @@ const {
   register,
   getAccounts,
 } = require('../controllers/auth.controller');
+
+console.log(typeof register);
 const {
   createAccount,
   updateAccount,
@@ -16,8 +18,11 @@ const {
 const asyncMiddleware = require('../middleware/async.middleware');
 const authMiddleware = require('../middleware/auth.middleware');
 const roleMiddleware = require('../middleware/role.middleware');
+const validateRegistration = require('../validate/roleValidate');
 
-router.route('/register').post(asyncMiddleware(register));
+router
+  .route('/register')
+  .post(asyncMiddleware(validateRegistration), asyncMiddleware(register));
 
 router.route('/login').post(asyncMiddleware(login));
 
@@ -34,12 +39,15 @@ router
   .route('/')
   .patch(
     asyncMiddleware(authMiddleware),
-    asyncMiddleware(roleMiddleware(['admin','user'])),
+    asyncMiddleware(roleMiddleware(['admin', 'user'])),
     asyncMiddleware(updateAccount),
-  )
+  );
+
+router
+  .route('/:id')
   .delete(
     asyncMiddleware(authMiddleware),
-    asyncMiddleware(roleMiddleware(['user'])),
+    asyncMiddleware(roleMiddleware(['admin'])),
     asyncMiddleware(deleteAccount),
   );
 
