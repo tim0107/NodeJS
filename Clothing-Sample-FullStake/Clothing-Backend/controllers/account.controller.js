@@ -28,8 +28,8 @@ module.exports = {
       allowedUpdates = ["accountName", "password", "address", "phone", "role"];
     } else if (userRole === "user") {
       allowedUpdates = ["accountName", "password", "address", "phone"];
-    }
-
+    }  
+    
     const isValid = updates.every((key) => allowedUpdates.includes(key));
     if (!isValid) {
       return res.status(400).json({ message: "not allow" });
@@ -46,6 +46,9 @@ module.exports = {
       {$set: updateFields},
       {new:true}
     );
+
+    console.log('Updates:', updates);
+
 
     if(update) {
       return res.status(200).json({message: "updated"})
