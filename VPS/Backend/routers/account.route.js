@@ -22,8 +22,8 @@ router
     asyncMiddleware(createAccount),
   )
   .get(
-    asyncMiddleware(authMiddleware),
-    asyncMiddleware(roleMiddleWare(['admin', 'user'])),
+   // asyncMiddleware(authMiddleware),
+   // asyncMiddleware(roleMiddleWare(['admin', 'user'])),
     asyncMiddleware(getAllAccount),
   );
 

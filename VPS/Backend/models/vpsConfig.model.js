@@ -25,6 +25,10 @@ const vpsConfigs = mongoose.Schema(
         price: {
             type: Number,
             required: true
+        },
+        img: {
+            type: String,
+            default: 'https://dummyimage.com/300'
         }
     },
     {

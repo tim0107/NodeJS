@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+    <h1>This is testing</h1>
+    <h1> Simple chat</h1>
+    <div id="mario-chat">
+        <div id="output"></div>
+        <input id="messageInput" type="text" placeholder="enter the placeholer">
+        <input id="handleInput" type="text" placeholder="enter the message">
+        <button id="send">Send</button>
+
+    </div>
+    <script>
+        // Kết nối tới server
+        const socket = io("http://localhost:5000");
+
+        //query
+        const message = document.getElementById('messageInput');
+        const handle = document.getElementById('handleInput');
+        const btn = document.getElementById('send');
+        const output = document.getElementById('output');
+
+        //emit event
+        btn.addEventListener('click', () => {
+            socket.emit('chat',{
+                message: message.value,
+                handle: handle.value
+            } )
+        })
+
+        
+
+        socket.on('chat', (data) => {
+                output.innerHTML += '<p><strong>' + data.handle + ':</strong> ' + data.message + '</p>';
+        })
+    
+        // // Lắng nghe sự kiện "message" từ server
+        // socket.on("message", (data) => {
+        //   const msgDiv = document.createElement("div");
+        //   msgDiv.textContent = data;
+        //   document.getElementById("message").appendChild(msgDiv);
+        // });
+    
+        // // Hàm gửi tin nhắn lên server
+        // function sendMessage() {
+        //   const input = document.getElementById("messageInput");
+        //   socket.emit("message", input.value);
+        //   input.value = "";
+        // }
+      </script>
+</body>
+</html>

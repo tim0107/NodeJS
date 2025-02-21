@@ -7,7 +7,8 @@ const router = require('./routers')
 
 app.use(express.json()) // gửi json lên 
 app.use(express.urlencoded({extended:true})) // format để HTML gửi data tới server
-
+app.use(express.static('./public'));
+app.use(express.static('./uploads'));
 
 connectDB();
 router(app);
