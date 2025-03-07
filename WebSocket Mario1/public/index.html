@@ -3,58 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
-
-    <title>Document</title>
+    <title>Chat Room</title>
 </head>
 <body>
-    <h1>This is testing</h1>
-    <h1> Simple chat</h1>
-    <div id="mario-chat">
+    <div>
+        <form id="joinRoom">
+            <input type="text" id="roomId" placeholder="Enter the room ID">
+            <button type="submit">Join Room</button>
+        </form>
+        
         <div id="output"></div>
-        <input id="messageInput" type="text" placeholder="enter the placeholer">
-        <input id="handleInput" type="text" placeholder="enter the message">
-        <button id="send">Send</button>
-
+        <form id="chatForm">
+            <label for="userInput">Message</label>
+            <input type="text" id="userInput" placeholder="Enter the message">
+            <input type="text" id="user" placeholder="Enter the username">
+            <button type="submit">Send</button>
+        </form>
     </div>
+
     <script>
-        // Kết nối tới server
+        const userInput = document.getElementById('userInput');
+        const roomId = document.getElementById('roomId');
+        const output = document.getElementById('output');
+        const sendMsg = document.getElementById('chatForm');
+        const userName = document.getElementById('user');
+        const joinRoomForm = document.getElementById('joinRoom');
+
         const socket = io("http://localhost:5000");
 
-        //query
-        const message = document.getElementById('messageInput');
-        const handle = document.getElementById('handleInput');
-        const btn = document.getElementById('send');
-        const output = document.getElementById('output');
+        joinRoomForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const room = roomId.value;
+            if (room) {
+                socket.emit('joinRoom', room);
+                output.innerHTML += `<p><strong>Joined Room: ${room}</strong></p>`;
+            }
+        });
 
-        //emit event
-        btn.addEventListener('click', () => {
-            socket.emit('chat',{
-                message: message.value,
-                handle: handle.value
-            } )
-        })
+        sendMsg.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = userInput.value;
+            const user = userName.value;
+            const room = roomId.value;
 
-        
+            if (message && user) {
+                socket.emit('chat', { room, message, user });
+                userInput.value = '';
+            }
+        });
 
         socket.on('chat', (data) => {
-                output.innerHTML += '<p><strong>' + data.handle + ':</strong> ' + data.message + '</p>';
-        })
-    
-        // // Lắng nghe sự kiện "message" từ server
-        // socket.on("message", (data) => {
-        //   const msgDiv = document.createElement("div");
-        //   msgDiv.textContent = data;
-        //   document.getElementById("message").appendChild(msgDiv);
-        // });
-    
-        // // Hàm gửi tin nhắn lên server
-        // function sendMessage() {
-        //   const input = document.getElementById("messageInput");
-        //   socket.emit("message", input.value);
-        //   input.value = "";
-        // }
-      </script>
+            output.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+        });
+
+        userInput.addEventListener('keypress', () => {
+            const user = userName.value;
+            if (user) {
+                socket.emit('typing', user);
+            }
+        });
+
+        socket.on('typing', (user) => {
+            output.innerHTML += `<p><em>${user} is typing...</em></p>`;
+        });
+    </script>
 </body>
 </html>

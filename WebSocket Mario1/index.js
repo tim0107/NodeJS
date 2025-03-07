@@ -1,49 +1,39 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+
 const app = express();
-
-
-
-app.use(express.static("./public"));
-
-// socket setup
-
-//const server = require('http').createServer();
-const server = http.createServer(app); // create a http server with express , socket will use this to control the real time.
-
+const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "*", // Cho phép tất cả các domain kết nối
-  },
+    cors: {
+        origin: "*", 
+        methods: ["GET", "POST"]
+    }
 });
 
-//listen to the client ,
-// whenever one client connect, socketio will create an object for that client ( identify by socket.id)
+app.use(express.static("public"));
+
 io.on("connection", (socket) => {
-  console.log("⚡ Client connected:", socket.id);
+    console.log("⚡ Client connected:", socket.id);
 
-  socket.on('chat', (data) => {
-    io.emit('chat',data);
-  })
+    socket.on('joinRoom', (room) => {
+        socket.join(room);
+        console.log(`User ${socket.id} joined room: ${room}`);
+    });
 
-  
-// Nhận message từ client
-// "message" is the name of the event
-// data is the data from the client
-// io.emit is use to send data back to all the client connected  --- aka broadcast message
-// socket.on("message", (data) => {
-//     console.log("📩 Received:", data);
-//     io.emit("message", data); // Gửi lại cho tất cả clients
-//   });
-  
-//   // Xử lý khi client ngắt kết nối
-//   socket.on("disconnect", () => {
-//     console.log("❌ Client disconnected:", socket.id);
-//   });
-  
+    socket.on('chat', (data) => {
+        io.to(data.room).emit('chat', data); 
+    });
+
+    socket.on('typing', (user) => {
+        socket.broadcast.emit('typing', user);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("❌ Client disconnected:", socket.id);
+    });
 });
 
 server.listen(5000, () => {
-    console.log("server is running at port 5000");
-  });
+    console.log("Server is running on port 5000");
+});

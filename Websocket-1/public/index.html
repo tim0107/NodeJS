@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <h2>Chat Room</h2>
+        <form id="joinRoom">
+            <input type="text" id="roomId" placeholder="Enter the room ID">
+            <button type="submit">Join Room</button>
+        </form>
+        
+        <div id="output" class="output"></div>
+        
+        <form id="chatForm">
+            <input type="text" id="user" placeholder="Enter your username">
+            <input type="text" id="userInput" placeholder="Enter your message">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        const userInput = document.getElementById('userInput');
+        const roomId = document.getElementById('roomId');
+        const output = document.getElementById('output');
+        const sendMsg = document.getElementById('chatForm');
+        const userName = document.getElementById('user');
+        const joinRoomForm = document.getElementById('joinRoom');
+    
+        const socket = io("http://localhost:5000");    
+        
+        joinRoomForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const room = roomId.value.trim();
+            if (room) {
+                socket.emit('joinRoom', room);
+                output.innerHTML += `<p class="message"><strong>Joined Room: ${room}</strong></p>`;
+            }
+        });
+    
+        sendMsg.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            const user = userName.value.trim();
+            const room = roomId.value.trim();
+    
+            if (message && user) {
+                socket.emit('chat', { room, message, user });
+                userInput.value = ''; 
+                socket.emit('stopTyping', room); 
+            }
+        });
+    
+        socket.on('chat', (data) => {
+            output.innerHTML += `<p class="message"><strong>${data.user}:</strong> ${data.message}</p>`;
+        });
+    </script>
+    
+</body>
+</html>
